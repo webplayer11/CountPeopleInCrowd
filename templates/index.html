@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CrowdLens — Đếm người trong đám đông bằng AI</title>
+    <meta name="description"
+          content="Hệ thống đếm số lượng người trong đám đông bằng trí tuệ nhân tạo." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER ═══════════════════════════════ -->
+<header class="header">
+    <div class="header__inner">
+        <div class="brand">
+            <svg class="brand__icon" viewBox="0 0 32 32" fill="none"
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="9"  cy="10" r="3.5" stroke="currentColor" stroke-width="1.7"/>
+                <circle cx="23" cy="10" r="3.5" stroke="currentColor" stroke-width="1.7"/>
+                <circle cx="16" cy="9"  r="4"   fill="currentColor"   opacity=".15"/>
+                <circle cx="16" cy="9"  r="4"   stroke="currentColor" stroke-width="1.7"/>
+                <path d="M3.5 25c0-3.038 2.462-5.5 5.5-5.5h1"
+                      stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                <path d="M28.5 25c0-3.038-2.462-5.5-5.5-5.5h-1"
+                      stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                <path d="M9.5 25c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5"
+                      stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+            <span class="brand__name">CrowdLens</span>
+        </div>
+        <span class="header__tagline">Đếm người • Bản đồ mật độ • AI Crowd Counting</span>
+    </div>
+</header>
+
+<!-- ═══════════════════════ HERO ══════════════════════════════════ -->
+<div class="hero">
+    <div class="hero__inner">
+        <h1 class="hero__title">CrowdLens</h1>
+        <p class="hero__sub">
+            Hệ thống đếm số lượng người trong đám đông bằng trí tuệ nhân tạo
+        </p>
+    </div>
+</div>
+
+<!-- ═══════════════════════ MAIN ══════════════════════════════════ -->
+<main class="page">
+
+    <!-- ── CỘT TRÁI: Tải ảnh ──────────────────────────────────── -->
+    <section class="card" aria-labelledby="upload-heading">
+        <div class="card__head">
+            <h2 class="card__title" id="upload-heading">Tải ảnh lên</h2>
+            <p  class="card__sub">PNG • JPG • JPEG &nbsp;·&nbsp; Tối đa 16 MB</p>
+        </div>
+
+        <!-- Vùng kéo thả -->
+        <div id="dropzone" class="dropzone" role="button" tabindex="0"
+             aria-label="Kéo thả ảnh vào đây hoặc nhấn để chọn ảnh">
+
+            <input id="file-input" type="file"
+                   accept="image/png,image/jpeg,image/webp,image/bmp"
+                   class="visually-hidden"
+                   aria-label="Chọn file ảnh" />
+
+            <!-- Trạng thái chờ -->
+            <div id="dz-idle" class="dropzone__idle">
+                <svg class="dz-upload-icon" viewBox="0 0 56 56" fill="none"
+                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="4" y="4" width="48" height="48" rx="12"
+                          stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/>
+                    <path d="M28 37V21" stroke="currentColor"
+                          stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M21 27l7-7 7 7" stroke="currentColor"
+                          stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18 41h20" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" opacity=".4"/>
+                </svg>
+                <p class="dz-cta">Kéo thả ảnh vào đây</p>
+                <p class="dz-or">— hoặc —</p>
+                <button type="button" class="btn btn--outline btn--sm"
+                        onclick="document.getElementById('file-input').click()">
+                    Nhấn để chọn ảnh
+                </button>
+            </div>
+
+            <!-- Trạng thái xem trước -->
+            <div id="dz-preview" class="dropzone__preview hidden">
+                <img id="preview-img" src="" alt="Xem trước ảnh đã chọn" />
+                <div class="dropzone__overlay">
+                    <button type="button" class="btn btn--ghost-white btn--sm"
+                            onclick="document.getElementById('file-input').click()">
+                        Đổi ảnh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin file -->
+        <div id="file-meta" class="file-meta hidden" aria-live="polite">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"
+                 aria-hidden="true">
+                <path d="M2.5 1.5h6l3 3v8a.5.5 0 01-.5.5h-8.5a.5.5 0 01-.5-.5v-10.5a.5.5 0 01.5-.5z"
+                      stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                <path d="M8.5 1.5v3.5h3.5" stroke="currentColor"
+                      stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span id="file-name" class="file-meta__name">—</span>
+            <span id="file-size" class="file-meta__size">—</span>
+        </div>
+
+        <!-- Thông báo lỗi -->
+        <div id="error-alert" class="alert alert--error hidden"
+             role="alert" aria-live="assertive">
+            <svg class="alert__icon" viewBox="0 0 17 17" fill="none"
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="7.5"
+                        stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8.5 4.5v4.5" stroke="currentColor"
+                      stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="8.5" cy="11.5" r=".85" fill="currentColor"/>
+            </svg>
+            <span id="error-msg"></span>
+        </div>
+
+        <!-- Nút phân tích -->
+        <button id="analyze-btn" type="button"
+                class="btn btn--primary btn--full" disabled>
+            <svg class="btn__spinner hidden" viewBox="0 0 16 16" fill="none"
+                 aria-hidden="true">
+                <circle cx="8" cy="8" r="6" stroke="currentColor"
+                        stroke-width="2" stroke-dasharray="30"
+                        stroke-dashoffset="10" stroke-linecap="round"/>
+            </svg>
+            <span class="btn__label">Phân tích ảnh</span>
+        </button>
+    </section>
+
+    <!-- ── CỘT PHẢI: Kết quả ──────────────────────────────────── -->
+    <section class="card card--results" aria-labelledby="results-heading">
+        <div class="card__head">
+            <h2 class="card__title" id="results-heading">Kết quả phân tích</h2>
+            <p  class="card__sub">bản đồ mật độ • số lượng người • thời gian xử lý</p>
+        </div>
+
+        <!-- Trạng thái trống -->
+        <div id="state-empty" class="state state--empty">
+            <svg class="state__graphic" viewBox="0 0 80 80" fill="none"
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="8" y="8" width="64" height="64" rx="16"
+                      stroke="currentColor" stroke-width="2" stroke-dasharray="8 5"/>
+                <circle cx="30" cy="33" r="7" stroke="currentColor" stroke-width="2"/>
+                <circle cx="50" cy="33" r="7" stroke="currentColor" stroke-width="2"/>
+                <path d="M19 58c0-6.075 4.925-11 11-11h20c6.075 0 11 4.925 11 11"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <p class="state__title">Chưa có ảnh nào được phân tích</p>
+            <p class="state__body">
+                Tải ảnh lên bên trái và nhấn
+                <strong>Phân tích ảnh</strong> để xem bản đồ mật độ và số lượng người.
+            </p>
+        </div>
+
+        <!-- Trạng thái đang tải -->
+        <div id="state-loading" class="state state--loading hidden"
+             aria-busy="true" aria-label="Đang phân tích…">
+            <div class="skeleton skeleton--img"></div>
+            <div class="skeleton-row">
+                <div class="skeleton skeleton--chip"></div>
+                <div class="skeleton skeleton--chip"></div>
+            </div>
+            <div class="skeleton skeleton--bar"></div>
+            <p class="state__loading-label">Đang phân tích ảnh…</p>
+        </div>
+
+        <!-- Trạng thái kết quả -->
+        <div id="state-result" class="state hidden">
+
+            <!-- Thẻ thống kê -->
+            <div class="stats" aria-label="Thống kê phân tích">
+                <div class="stat">
+                    <span class="stat__icon" aria-hidden="true">👥</span>
+                    <span id="stat-count" class="stat__value">—</span>
+                    <span class="stat__label">Số lượng người ước tính</span>
+                </div>
+                <div class="stat__divider" role="separator"></div>
+                <div class="stat">
+                    <span class="stat__icon" aria-hidden="true">⚡</span>
+                    <span id="stat-time" class="stat__value">—</span>
+                    <span class="stat__label">Thời gian xử lý</span>
+                </div>
+            </div>
+
+            <!-- Cặp ảnh -->
+            <div class="image-pair">
+                <div class="img-card">
+                    <div class="img-card__caption">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+                             aria-hidden="true">
+                            <rect x="1" y="1" width="10" height="10" rx="2"
+                                  stroke="currentColor" stroke-width="1.2"/>
+                            <circle cx="4.5" cy="4.5" r="1" fill="currentColor"/>
+                            <path d="M1 8.5l2.5-2.5 2 2 2-2.5 2.5 2.5"
+                                  stroke="currentColor" stroke-width="1.1"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Ảnh gốc
+                        <span class="img-card__hint">đầu vào</span>
+                    </div>
+                    <div class="img-card__frame">
+                        <img id="result-original" src="" alt="Ảnh gốc đã tải lên" />
+                    </div>
+                </div>
+
+                <div class="img-card">
+                    <div class="img-card__caption">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+                             aria-hidden="true">
+                            <circle cx="6" cy="6" r="5"
+                                    stroke="currentColor" stroke-width="1.2"/>
+                            <circle cx="6" cy="6" r="2.8"
+                                    fill="currentColor" opacity=".3"/>
+                            <circle cx="6" cy="6" r="1" fill="currentColor"/>
+                        </svg>
+                        Bản đồ mật độ
+                        <span class="img-card__hint">heatmap</span>
+                    </div>
+                    <div class="img-card__frame">
+                        <img id="result-density" src="" alt="Bản đồ mật độ đám đông" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chú thích màu -->
+            <div class="legend" aria-label="Thang màu mật độ">
+                <span class="legend__label">Thấp</span>
+                <div class="legend__scale" role="img"
+                     aria-label="Gradient màu từ lạnh đến nóng"></div>
+                <span class="legend__label">Cao</span>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="result-actions">
+                <button id="reset-btn" type="button" class="btn btn--ghost btn--sm">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"
+                         aria-hidden="true">
+                        <path d="M1 6.5A5.5 5.5 0 1 0 2.25 3"
+                              stroke="currentColor" stroke-width="1.4"
+                              stroke-linecap="round"/>
+                        <path d="M1 1v2.5h2.5" stroke="currentColor"
+                              stroke-width="1.4" stroke-linecap="round"
+                              stroke-linejoin="round"/>
+                    </svg>
+                    Phân tích ảnh mới
+                </button>
+            </div>
+
+        </div><!-- /state-result -->
+    </section>
+
+</main>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════════════ -->
+<footer class="footer">
+    CrowdLens &mdash; <code>POST /analyze</code> &middot;
+    Tích hợp model thật tại <code>model/predictor.py</code>
+</footer>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
