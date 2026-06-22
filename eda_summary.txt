@@ -1,4 +1,0 @@
-Total images: 300
-Min: 33
-Max: 3138
-Mean: 541.38
